@@ -32,11 +32,11 @@ fn fetch_forex_rate(api_key: &str, pair: &str) -> Result<f64, String> {
 }
 
 fn fetch_historical_rates(api_key: &str, pair: &str) -> Result<Vec<(NaiveDate, f64)>, String> {
-    let base_currency = &pair[..3];
-    let target_currency = &pair[3..];
-    let mut rates = Vec::new();
-    let end_date = Utc::now().date_naive();
-    let start_date = end_date - chrono::Duration::days(30);
+    let base_currency: &str = &pair[..3];
+    let target_currency: &str = &pair[3..];
+    let mut rates: Vec<(NaiveDate, f64)> = Vec::new();
+    let end_date: NaiveDate = Utc::now().date_naive();
+    let start_date: NaiveDate = end_date - chrono::Duration::days(30);
 
     for date in (0..=30).map(|i| start_date + chrono::Duration::days(i)) {
         let url = format!(
