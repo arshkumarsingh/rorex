@@ -35,14 +35,14 @@ struct HistoricalResponse {
 /// If the currency pair is not found in the response, an error message is returned.
 pub fn fetch_forex_rate(api_key: &str, pair: &str) -> Result<f64, String> {
     // Construct the URL for the API request
-    let url = format!("https://v6.exchangerate-api.com/v6/{}/latest/{}", api_key, &pair[..3]);
-
-    // Create a new HTTP client
-    let client = Client::new();
+    let url = format!(
+        "https://v6.exchangerate-api.com/v6/{}/latest/{}",
+        api_key,
+        &pair[..3]
+    );
 
     // Send a GET request to the API and get the response
-    let response = client.get(&url)
-        .send()
+    let response = reqwest::blocking::get(&url)
         .map_err(|e| e.to_string())?;
 
     // Deserialize the API response into a struct
