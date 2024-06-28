@@ -114,32 +114,53 @@ struct App {
     /// tuple contains the date and the rate on that date.
     historical_rates: Vec<(NaiveDate, f64)>,
 }
+/// Represents the application state.
 impl App {
-    fn new() -> Self {
+    /// Creates a new instance of `App`.
+    ///
+    /// Returns an instance of `App` with default values for all fields.
+    pub fn new() -> Self {
+        // Create a channel for fetching the forex rate
         let (fetch_rate_tx, fetch_rate_rx) = mpsc::channel();
+        
         App {
+            // API key for the ExchangeRate-API service
             api_key: "".to_string(),
+            // Base currency for forex conversion
             base_currency: "USD".to_string(),
+            // Target currency for forex conversion
             target_currency: "EUR".to_string(),
+            // Fetched forex rate
             rate: None,
+            // Sender end of a channel for fetching the forex rate
             fetch_rate_tx,
+            // Receiver end of a channel for fetching the forex rate
             fetch_rate_rx,
+            // List of available currencies
             currencies: vec![
-                "USD", "EUR", "JPY", "GBP", "AUD", "CAD", "CHF", "CNY", "AED", "AFN", "ALL", "AMD", "ANG",
-                "AOA", "ARS", "AWG", "AZN", "BAM", "BBD", "BDT", "BGN", "BHD", "BIF", "BMD", "BND", "BOB",
-                "BRL", "BSD", "BTN", "BWP", "BYN", "BZD", "CDF", "CLP", "COP", "CRC", "CUP", "CVE", "CZK",
-                "DJF", "DKK", "DOP", "DZD", "EGP", "ERN", "ETB", "FJD", "FKP", "FOK", "GEL", "GGP", "GHS",
-                "GIP", "GMD", "GNF", "GTQ", "GYD", "HKD", "HNL", "HRK", "HTG", "HUF", "IDR", "ILS", "IMP",
-                "INR", "IQD", "IRR", "ISK", "JEP", "JMD", "JOD", "KES", "KGS", "KHR", "KID", "KMF", "KRW",
-                "KWD", "KYD", "KZT", "LAK", "LBP", "LKR", "LRD", "LSL", "LYD", "MAD", "MDL", "MGA", "MKD",
-                "MMK", "MNT", "MOP", "MRU", "MUR", "MVR", "MWK", "MXN", "MYR", "MZN", "NAD", "NGN", "NIO",
-                "NOK", "NPR", "NZD", "OMR", "PAB", "PEN", "PGK", "PHP", "PKR", "PLN", "PYG", "QAR", "RON",
-                "RSD", "RUB", "RWF", "SAR", "SBD", "SCR", "SDG", "SEK", "SGD", "SHP", "SLE", "SLL", "SOS",
-                "SRD", "SSP", "STN", "SYP", "SZL", "THB", "TJS", "TMT", "TND", "TOP", "TRY", "TTD", "TVD",
-                "TWD", "TZS", "UAH", "UGX", "UYU", "UZS", "VES", "VND", "VUV", "WST", "XAF", "XCD", "XDR",
-                "XOF", "XPF", "YER", "ZAR", "ZMW", "ZWL",
+                // Currencies are listed in alphabetical order
+                "AED", "AFN", "ALL", "AMD", "ANG", "AOA", "ARS", "AUD", "AWG", "AZN", "BAM", "BBD", "BDT",
+                "BGN", "BHD", "BIF", "BMD", "BND", "BOB", "BRL", "BSD", "BTN", "BWP", "BYN", "BZD", "CAD",
+                "CHF", "CLP", "CNY", "COP", "CRC", "CUP", "CVE", "CZK", "DJF", "DKK", "DOP", "DZD", "EGP",
+                "ERN", "ETB", "EUR", "FJD", "FKP", "FOK", "GBP", "GEL", "GGP", "GHS", "GIP", "GMD", "GNF",
+                "GTQ", "GYD", "HKD", "HNL", "HRK", "HTG", "HUF", "IDR", "ILS", "IMP", "INR", "IQD", "IRR",
+                "ISK", "JEP", "JMD", "JOD", "JPY", "KES", "KGS", "KHR", "KID", "KMF", "KPW", "KRW", "KWD",
+                "KYD", "KZT", "LAK", "LBP", "LKR", "LRD", "LSL", "LYD", "MAD", "MDL", "MGA", "MKD", "MMK",
+                "MNT", "MOP", "MRU", "MUR", "MVR", "MWK", "MXN", "MYR", "MZN", "NAD", "NGN", "NIO", "NOK",
+                "NPR", "NZD", "OMR", "PAB", "PEN", "PGK", "PHP", "PKR", "PLN", "PYG", "QAR", "RON", "RSD",
+                "RUB", "RWF", "SAR", "SBD", "SCR", "SDG", "SEK", "SGD", "SHP", "SLL", "SOS", "SRD", "SSP",
+                "STN", "SYP", "SZL", "THB", "TJS", "TMT", "TND", "TOP", "TRY", "TTD", "TVD", "TWD", "TZS",
+                "UAH", "UGX", "UYU", "UZS", "VES", "VND", "VUV", "WST", "XAF", "XCD", "XDR", "XOF", "XPF",
+                "YER", "ZAR", "ZMW", "ZWL",
             ],
+            // Trend of historical rates
+            // The trend is represented as a vector of `f64` values, where each value
+            // represents the rate on a specific date. The dates are not explicitly
+            // stored in the vector, but can be inferred from the vector index.
             trend: Vec::new(),
+            // Historical rates for a given currency pair
+            // The historical rates are represented as a vector of tuples, where each
+            // tuple contains the date and the rate on that date.
             historical_rates: Vec::new(),
         }
     }
