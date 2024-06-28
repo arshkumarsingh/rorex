@@ -86,18 +86,34 @@ fn fetch_historical_rates(api_key: &str, pair: &str) -> Result<Vec<(NaiveDate, f
     Ok(rates)
 }
 
+/// Represents the application state.
 struct App {
+    /// The API key for the ExchangeRate-API service.
     api_key: String,
+    /// The base currency for forex conversion.
     base_currency: String,
+    /// The target currency for forex conversion.
     target_currency: String,
+    /// The forex rate if it has been fetched.
     rate: Option<f64>,
+    /// The sender end of a channel for fetching the forex rate.
     fetch_rate_tx: Sender<Option<f64>>,
+    /// The receiver end of a channel for fetching the forex rate.
     fetch_rate_rx: Receiver<Option<f64>>,
+    /// The list of available currencies.
     currencies: Vec<&'static str>,
+    /// The trend of historical rates.
+    ///
+    /// The trend is represented as a vector of `f64` values, where each value
+    /// represents the rate on a specific date. The dates are not explicitly
+    /// stored in the vector, but can be inferred from the vector index.
     trend: Vec<f64>,
+    /// The historical rates for a given currency pair.
+    ///
+    /// The historical rates are represented as a vector of tuples, where each
+    /// tuple contains the date and the rate on that date.
     historical_rates: Vec<(NaiveDate, f64)>,
 }
-
 impl App {
     fn new() -> Self {
         let (fetch_rate_tx, fetch_rate_rx) = mpsc::channel();
