@@ -18,17 +18,45 @@ struct HistoricalResponse {
     rates: HashMap<String, HashMap<String, f64>>,
 }
 
-fn fetch_forex_rate(api_key: &str, pair: &str) -> Result<f64, String> {
+/// Fetches the forex rate for a given currency pair using the provided API key.
+///
+/// # Arguments
+///
+/// * `api_key` - The API key for the ExchangeRate-API service.
+/// * `pair` - The currency pair to fetch the rate for. Format: "base_currencytarget_currency".
+///
+/// # Returns
+///
+/// * `Result<f64, String>` - The forex rate if successful, otherwise an error message.
+///
+/// # Errors
+///
+/// If the HTTP request fails or the JSON deserialization fails, an error message is returned.
+/// If the currency pair is not found in the response, an error message is returned.
+pub fn fetch_forex_rate(api_key: &str, pair: &str) -> Result<f64, String> {
+    // Construct the URL for the API request
     let url = format!("https://v6.exchangerate-api.com/v6/{}/latest/{}", api_key, &pair[..3]);
 
+    // Create a new HTTP client
     let client = Client::new();
-    let response = client.get(&url).send().map_err(|e| e.to_string())?;
-    let forex_response: ForexResponse = response.json().map_err(|e| e.to_string())?;
 
+    // Send a GET request to the API and get the response
+    let response = client.get(&url)
+        .send()
+        .map_err(|e| e.to_string())?;
+
+    // Deserialize the API response into a struct
+    let forex_response: ForexResponse = response
+        .json()
+        .map_err(|e| e.to_string())?;
+
+    // Get the target currency rate from the response
     let target_currency = &pair[3..];
-    forex_response.conversion_rates.get(target_currency).copied().ok_or_else(|| {
-        "Currency pair not found".to_string()
-    })
+    forex_response.conversion_rates.get(target_currency)
+        .copied()
+        .ok_or_else(|| {
+            "Currency pair not found".to_string()
+        })
 }
 
 fn fetch_historical_rates(api_key: &str, pair: &str) -> Result<Vec<(NaiveDate, f64)>, String> {
